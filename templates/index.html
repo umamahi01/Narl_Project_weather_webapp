@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content:flex-start;
+      height: 100vh;
+      margin: 0;
+      font-family: Verdana, sans-serif;
+      font-size: 12px;
+    }
+
+    .logo-container {
+      align-self: flex-start;
+      margin-top: 20px;
+      margin-left: 20px; /* Left margin for logo */
+    }
+
+    .container {
+      display: flex;
+      justify-content: flex-start; /* Align content at flex-start */
+      align-items: flex-start; /* Align items at flex-start */
+      width: 100%;
+      margin-left: 20px; /* Left margin for form items */
+      margin-right: 20px; /* Right margin for image panel */
+    }
+
+    #left-panel {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      
+      flex-direction: column;
+      align-items: center; /* Align items at flex-start */
+      margin-right: 10px; 
+      margin-left: 10px;/* Right margin for form items */
+    }
+
+    #image-panel {
+      width: 900px; /* Fixed width for image panel */
+      height: 550px; /* Fixed height for image panel */
+      padding: 2px;
+      box-sizing: border-box;
+      display: flex;
+      align-self: center;
+      /* background-color: #ccc; */
+      align-items: center;
+      margin-right: 20px; /* Push image panel to the right */
+
+      
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      width: 100%; 
+      /* Set image width to 100% of parent container */
+      height: 100%;
+       /* Set image height to 100% of parent container */
+    }
+  
+    /* Style select elements */
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px; /* Space between elements */
+      margin-top: 20px;
+    }
+
+    select {
+      width: 200px; /* Set a specific width */
+      height: 28px; /* Set a specific height */
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 40px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+  <script>
+ function viewCities() {
+    window.open('map.html');
+  }
+
+    function handleSubmit() {
+      // Get selected values
+      const year = document.getElementById('year').value;
+      const month = document.getElementById('month').value;
+      const parameter = document.getElementById('parameter').value;
+      const domain = document.getElementById('domain').value;
+
+      // Build image source based on selected values
+      const imagePath = `images/${year}_${month}_${parameter}_${domain}.png`;
+
+      // Display image on the image panel
+      document.getElementById('image-panel').innerHTML = `<img src="${imagePath}" alt="Result Image">`;
+    }
+  </script>
+</head>
+
+<body>
+  <div class="logo-container">
+    <img src="wcrglogo.png" class="w3-mobile w3-margin-bottom" style="max-height: 85px" />
+  </div>
+
+  <div class="container">
+    <div id="left-panel">
+      <form action="#">
+        <label for="year"><h2>Select Year</h2></label>
+        <select id="year">
+          <option value="2022">2022</option>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+        </select>
+
+        <label for="month"><h2>Select Month</h2></label>
+        <select id="month">
+          <!-- Add 12 months as options -->
+        </select>
+
+        <label for="parameter"><h2>Select Parameter</h2></label>
+        <select id="parameter">
+          <option value="Rainfall">Rainfall</option>
+          <option value="Temperature">Temperature</option>
+          <option value="RainfallSkillscore">RainfallSkillscore</option>
+        </select>
+
+        <label for="domain"><h2>Select Domain</h2></label>
+        <select id="domain">
+          <option value="4km">4km</option>
+          <option value="12km">12km</option>
+          <option value="0.44km">0.44km</option>
+        </select>
+ 
+        <button onclick="handleSubmit()">Submit</button><br><br>
+        <button onclick="viewCities()">View Cities</button>
+      </form>
+    </div>
+
+    <div id="image-panel"></div>
+  </div>
+
+  <script>
+    // Populate months in the dropdown
+    const monthDropdown = document.getElementById('month');
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    months.forEach((month, index) => {
+      const option = document.createElement('option');
+      option.value = index + 1; // Month values are 1-based
+      option.text = month;
+      monthDropdown.add(option);
+    });
+  </script>
+</body>
+
+</html>

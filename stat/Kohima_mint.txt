@@ -1,0 +1,4 @@
+month minimumtemperature_observed(k) minimumtemperature_predicted(k)
+oct 21.013926 14.986067
+nov 14.293674 10.621852
+dec 11.676624 7.635259

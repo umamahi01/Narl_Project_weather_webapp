@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set-ExecutionPolicy Unrestricted -Scope Process</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            overflow-y:scroll; 
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            /* overflow-y: hidden; */
+            font-family: Arial, sans-serif;
+        }
+        table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+        img {
+            max-width: 50%;
+            align-self: left;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+        justify-content: space-between;
+        height: 90vh; /* 90% of the viewport height */
+        padding: 20px; /* Add padding around the container */
+        }
+
+        form {
+            padding: 9%;
+            flex: 1;
+        }
+
+        #map {
+            margin-bottom: 5px;
+            /* height: 60vh; */
+            flex: 1;
+           max-width:100%;
+            height: 70vh; /* Full height of the container */
+        border: 1px solid rgb(12, 11, 11); /* Optional: Add a border for clarity */
+            /* padding-top: 10px; */
+        }
+     
+
+       /* CSS for modal */
+.modal {
+    display: none; /* Hidden by default */
+    position:absolute; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 50%; /* Center horizontally */
+    top: 50%; /* Center vertically */
+    transform: translate(-50%, -50%); /* Center the modal */
+    width: 100vw; /* Set fixed width in viewport width units */
+    height: 100vh; /* Set fixed height in viewport height units */
+    max-width: 600px; /* Optional: Set maximum width */
+    max-height: 500px; /* Optional: Set maximum height */
+    overflow: auto; /* Enable scrolling if needed */
+    background-color: rgb(253, 253, 255);/* Black w/ opacity*/
+}
+
+.modal-content {
+    background-color: #fcfafa;
+    margin: 0 auto; /* Center horizontally */
+    padding: 20px;
+    /* border: 1px solid #888; */
+    width: 100%; /* Full width inside modal */
+    height: 100%; /* Full height inside modal */
+    box-sizing: border-box; /* Include padding in width/height calculation */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border-radius: 10px;
+}
+
+/* Close button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+    </style>
+</head>
+<body>
+
+    <img src="wcrglogo.png" alt="Weather">
+    <div class="container">
+        <form id="zoomForm" action="#">
+         
+            <label for="SelectLocation" ><b>Select Location</b></label><br>
+            <select id="citySelector" onchange="handleLocationClick(this.value)" class="box" name="selectedCity"><br>
+           </select> <br/><br/>
+          
+            <button onclick="handleSubmit()"  type="button">Submit</button>
+        </form>
+        <div id="map"></div>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modalContent">hello</p>
+           
+        </div>
+    </div>
+ <!-- Add dataContainer here -->
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([13.62,79.41], 5);
+
+       
+        var customAttribution = 'Contribution To NARL';
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: customAttribution
+        }).addTo(map);
+
+
+        var markersData = [
+            //  city data here
+            [13.62, 79.41, "Tirupati"],
+    [16.50, 80.64, "Vijayawada"],
+    [17.68, 83.21, "Visakhapatnam"],
+    [27.08, 93.60, "Itanagar"],
+    [28.06, 95.32, "Pasighat"],
+    [27.58, 91.87, "Tawang"],
+    [26.20, 92.93, "Assam"],
+    [25.59, 85.13, "Patna"],
+    [22.07, 82.13, "Bilaspur"],
+    [21.25, 81.62, "Raipur"],
+    [31.10, 77.17, "Shimla"],
+    [28.53, 77.39, "Noida"],
+    [13.72, 80.22, "SHAR"],
+    [13.07, 79.65, "Arakonam"],
+    [12.97, 77.59, "Bangalore"],
+    [13.08, 80.27, "Chennai"],
+    [13.45, 79.17, "Gadanki"],
+    [17.47, 78.58, "Hyderabad"],
+    [15.49, 73.82, "Panaji"],
+    [11.91, 79.81, "Puducherry"],
+    [22.57, 88.36, "Kolkata"],
+    [25.57, 91.89, "Shilong"],
+    [23.21, 72.63, "Gandhinagar"],
+    [24.59, 72.71, "Mount Abu"],
+    [29.39, 79.45, "Nainital"],
+    [21.14, 79.08, "Nagpur"],
+    [8.52, 76.93, "Thiruvananthapuram"],
+    [9.93, 76.26, "Kochi"],
+    [30.73, 76.77, "Chandigarh"],
+    [27.33, 88.61, "Gangtok"],
+    [23.34, 85.30, "Ranchi"],
+    [21.25, 81.62, "Raipur"],
+    [23.25, 77.41, "Bhopal"],
+    [22.71, 75.85, "Indor"],
+    [20.29, 85.82, "Bhubaneswar"],
+    [26.91, 75.78, "Jaipur"],
+    [26.84, 80.94, "Lucknow"],
+    [18.90, 72.80, "Mumbai"],
+    [18.52, 73.85, "Pune"],
+    [24.81, 93.93, "Imphal"],
+    [23.72, 92.71, "Aizwal"],
+    [25.67, 94.10, "Kohima"],
+    [23.83, 91.28, "Agartala"],
+    [30.31, 78.03, "Dehradun"],
+    [28.70, 77.10, "Delhi"],
+    [15.29, 74.12, "Goa"],
+    [23.02, 72.57, "Ahmedabad"]
+
+
+            // Add more cities as needed
+    ];
+
+
+   
+
+    var markers = {}; // Object to store markers
+
+// Loop through markersData to create markers on the map
+markersData.forEach(function (data) {
+    var marker = L.marker([data[0], data[1]]).addTo(map);
+    marker.bindPopup("<b>" + data[2] + "</b><br>");
+    markers[data[2]] = marker;
+
+    // Create dropdown options for each marker
+    var option = document.createElement("option");
+    option.value = data[2];
+    option.text = data[2];
+    document.getElementById("citySelector").appendChild(option);
+
+    // Add click event listener to each marker
+    marker.on('click', function () {
+        zoomToCity(data[2]); // Zoom to city corresponding to the marker
+        displayFullData(data[2]) // Display full data for the selected city
+    });
+});
+
+// Zoom to selected city when using dropdown
+function zoomToSelectedCity() {
+    var selectedCity = document.getElementById("citySelector").value;
+    zoomToCity(selectedCity);
+}
+
+// Zoom to the selected city's marker on the map
+function zoomToCity(city) {
+    var marker = markers[city];
+    if (marker) {
+        map.setView(marker.getLatLng(), 10); // Zoom to marker's location
+        marker.openPopup(); // Open popup for the selected marker
+    } else {
+        alert("Marker not found for the selected city!");
+    }
+}
+
+
+
+
+
+        
+
+
+async function fetchTemperatureData(city) {
+      const minFilePath = `/stat/${city}_mint.csv`;
+      const maxFilePath = `/stat/${city}_maxt.txt`;
+      const rainfallFilePath = `/stat/${city}_rainfall.txt`;
+     try {
+       
+        const [minData, maxData,rainfall] = await Promise.all([
+          fetchFile(minFilePath),
+          fetchFile(maxFilePath),
+          fetchFile(rainfallFilePath)
+
+        ]);
+        displayFullData(city); // Pass temperature data to display function
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+        
+   var city = document.getElementById("citySelector").value
+
+    // Define the folder path where CSV files are stored
+    var folderPath = "stat/";
+    // console.log("City",city);
+
+    // <button onclick="handleLocationClick('${city}', 'minTemp')">Min Temp</button>
+    //     <button onclick="handleLocationClick('${city}', 'maxTemp')">Max Temp</button>
+    //     <button onclick="handleLocationClick('${city}', 'rainfall')">Rainfall</button>
+    
+// Define the folder path where txt files are stored
+// var folderPath = "stat/";
+
+
+function showModal(city) {
+    var modal = document.getElementById("myModal");
+    var modalContent = document.getElementById("modalContent");
+    modalContent.innerHTML = `
+        <h2 style="margin-left: 5px;">${city}</h2><br>
+         <button onclick="showMinTemp('${city}', )">Min Temp</button>
+       <button onclick="showMaxTemp('${city}', )">Max Temp</button>
+        <button onclick="showRainfall('${city}',)">Rainfall</button><br/><br/>
+        <div id="dataContainer"></div><br/>
+    `;
+    modal.style.display = "block";
+}
+function showRainfall(city){
+    // Fetch and display rainfall data using the correct city name
+    var dataContainer = document.getElementById("dataContainer");
+    dataContainer.innerHTML = "<b>Rainfall Data for " + city + "</b>";
+    var rainfallFilePath = `/stat/${city}_rainfall.txt`;
+    fetch(rainfallFilePath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch rainfall CSV file');
+            }
+            return response.text();
+        })
+        .then(rainfallData => {
+            // Process the rainfall data as needed
+          
+            var rainfallTable = createTable(rainfallData, "Rainfall");
+            dataContainer.appendChild(rainfallTable); // Append Rainfall table
+          
+        })
+        .catch(error => {
+            console.error('Error fetching rainfall data:', error);
+            dataContainer.innerHTML = "<p>Error fetching rainfall data. Please try again later.</p>";
+        });
+}
+function showMinTemp(city) {
+    var dataContainer = document.getElementById("dataContainer");
+    dataContainer.innerHTML = "<b>Min Temperature Data for " + city + "</b>";
+
+    // Fetch and display min temperature data using the correct city name
+    var minFilePath = `/stat/${city}_mint.txt`;
+    fetch(minFilePath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch min temperature CSV file');
+            }
+            return response.text();
+        })
+        .then(minData => {
+            // Process the min temperature data as needed
+          
+            var minTable = createTable(minData, "Min Temperature");
+            dataContainer.appendChild(minTable); // Append Min Temp table
+          
+        })
+        .catch(error => {
+            console.error('Error fetching min temperature data:', error);
+            dataContainer.innerHTML = "<p>Error fetching min temperature data. Please try again later.</p>";
+        });
+}
+function showMaxTemp(city) {
+    var dataContainer = document.getElementById("dataContainer");
+    dataContainer.innerHTML = "<b>Max Temperature Data for " + city + "</b>";
+
+    // Fetch and display max temperature data using the correct city name
+    var maxFilePath = `/stat/${city}_maxt.txt`;
+    fetch(maxFilePath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch max temperature CSV file');
+            }
+            return response.text();
+        })
+        .then(maxData => {
+            // Process the max temperature data as needed
+          
+            var maxTable = createTable(maxData, "Max Temperature");
+            dataContainer.appendChild(maxTable); // Append Max Temp table
+          
+        })
+        .catch(error => {
+            console.error('Error fetching max temperature data:', error);
+            dataContainer.innerHTML = "<p>Error fetching max temperature data. Please try again later.</p>";
+        });
+}
+ // Function to fetch and display full data from the selected CSV files
+ function displayFullData(city) {
+    var maxFilePath = `/stat/${city}_maxt.txt`;
+    var minFilePath = `/stat/${city}_mint.txt`;
+    var rainfallFilePath = `/stat/${city}_rainfall.txt`;
+
+  
+    console.log("Fetching CSV files from:", maxFilePath, minFilePath, rainfallFilePath);
+   Promise.all([
+        fetch(maxFilePath).then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch max temperature CSV file');
+            }
+            return response.text();
+        }),
+        fetch(minFilePath).then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch min temperature CSV file');
+            }
+            return response.text();
+        }),
+        fetch(rainfallFilePath).then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch rainfall CSV file');
+            }
+            return response.text();
+        })
+    ])
+    .then(([maxData, minData, rainfallData]) => {
+        console.log("CSV files fetched successfully:", maxData, minData, rainfallData);
+        
+        var maxTable = createTable(maxData, "Max Temperature");
+        var minTable = createTable(minData, "Min Temperature");
+        var rainfallTable = createTable(rainfallData, "Rainfall");
+
+        var modalContent = document.getElementById("modalContent");
+        modalContent.innerHTML = ""; // Clear previous content
+        modalContent.appendChild(maxTable); // Append Max Temp table
+        modalContent.appendChild(minTable); // Append Min Temp table
+        modalContent.appendChild(rainfallTable); // Append Rainfall table
+
+        showModal(city); // Open the modal after updating content
+
+    })
+    .catch(error => {
+        console.error('Error fetching CSV data:', error);
+        alert('Error fetching CSV data. Please check console for details.');
+    });
+}
+
+
+// Add or modify the handleSubmit function
+
+function handleSubmit() {
+      var selectedCity = citySelector.value;
+      if (selectedCity) {
+        displayFullData(selectedCity);
+        zoomToSelectedCity()
+      }
+    }
+
+// Rest of your code...
+
+
+// Function to create table from CSV data with a title
+function createTable(data, title) {
+    const rows = data.split(/\r?\n/); // Split by newline characters
+    const table = document.createElement('table');
+
+    // Create table title row
+    const titleRow = document.createElement('tr');
+    const titleCell = document.createElement('th');
+    titleCell.colSpan = 2; // Span the entire row
+    titleCell.textContent = title;
+    titleRow.appendChild(titleCell);
+    table.appendChild(titleRow);
+
+    // Create table header row
+    const headerRow = document.createElement('tr');
+    rows[0].split(',').forEach(header => {
+        const headerCell = document.createElement('th');
+        headerCell.textContent = header;
+        headerRow.appendChild(headerCell);
+    });
+    table.appendChild(headerRow);
+
+    // Create data rows
+    for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].split(',');
+        const dataRow = document.createElement('tr');
+        cells.forEach(cell => {
+            const dataCell = document.createElement('td');
+            dataCell.textContent = cell;
+            dataRow.appendChild(dataCell);
+        });
+        table.appendChild(dataRow);
+    }
+
+    return table;
+}
+
+
+
+
+ 
+
+
+
+
+function closeModal() {
+    document.getElementById("myModal").style.display = "none";
+}
+
+    </script>
+</body>
+</html>

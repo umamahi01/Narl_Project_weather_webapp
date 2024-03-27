@@ -1,0 +1,4 @@
+month Accumulated_rainfall_observed(mm) Accumulated_rainfall_predicted(mm)
+oct 220.732651 382.101898
+nov 0.004823 0.019405
+dec 35.937618 2.330443

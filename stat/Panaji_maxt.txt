@@ -1,0 +1,4 @@
+month maximumtemperature_observed(k) maximumtemperature_predicted(k)
+oct 30.878578 30.705729
+nov 33.226616 32.927582
+dec 33.276661 31.943701
