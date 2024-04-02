@@ -29,13 +29,13 @@ def logo():
 
 
 # Define the directory path where images are stored
-img_dir = os.path.join(os.path.dirname(__file__), 'images')
+# img_dir = os.path.join(os.path.dirname(__file__), 'images')
 
 # Route to serve images based on dynamic URL pattern
 @app.route('/images/<year>_<month>_<parameter>_<domain>.png')
 def images(year, month, parameter, domain):
-    img_name = f'images/{year}_{month}_{parameter}_{domain}.png'
-    return send_from_directory(img_dir, img_name)
+    img_name = f'{year}_{month}_{parameter}_{domain}.png'
+    return send_from_directory('static/images', img_name)
 
 
 
@@ -43,7 +43,7 @@ def images(year, month, parameter, domain):
 # Render the index.html template
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index (2).html')
 
 # Render the fetchb.html template when the view cities button is clicked
 
